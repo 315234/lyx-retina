@@ -2049,8 +2049,8 @@ void BufferView::clearSelection()
 void BufferView::resize(int width, int height)
 {
 	// Update from work area
-	width_ = width;
-	height_ = height;
+	width_ = width*2;
+	height_ = height*2;
 
 	// Clear the paragraph height cache.
 	d->par_height_.clear();

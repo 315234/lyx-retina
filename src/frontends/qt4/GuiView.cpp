@@ -157,6 +157,7 @@ public:
 		QString const text = lyx_version ?
 			qt_("version ") + lyx_version : qt_("unknown version");
 		splash_ = getPixmap("images/", "banner", "png");
+        splash_.setDevicePixelRatio(2.0);
 
 		QPainter pain(&splash_);
 		pain.setPen(QColor(0, 0, 0));
@@ -166,7 +167,7 @@ public:
 		font.setWeight(QFont::Bold);
 		font.setPointSize(int(toqstr(lyxrc.font_sizes[FONT_SIZE_LARGE]).toDouble()));
 		pain.setFont(font);
-		pain.drawText(190, 225, text);
+		pain.drawText(190/2, 225/2, text);
 		setFocusPolicy(Qt::StrongFocus);
 	}
 

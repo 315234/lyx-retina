@@ -121,10 +121,10 @@ struct GuiWorkArea::Private
 	{
 		delete screen_;
 		if (lyxrc.use_qimage) {
-			screen_ = new QImage(p->viewport()->width(), p->viewport()->height(),
+			screen_ = new QImage(p->viewport()->width()*2, p->viewport()->height()*2,
 				QImage::Format_ARGB32_Premultiplied);
 		} else {
-			screen_ = new QPixmap(p->viewport()->width(), p->viewport()->height());
+			screen_ = new QPixmap(p->viewport()->width()*2, p->viewport()->height()*2);
 		}
 	}
 	///

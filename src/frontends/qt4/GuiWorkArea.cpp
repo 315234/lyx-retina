@@ -179,7 +179,7 @@ public:
 		l_shape_ = l_shape;
 		rtl_ = rtl;
 		completable_ = completable;
-		x_ = x;
+		x_ = x/2.0;
 
 		// extension to left and right
 		int l = 0;
@@ -188,9 +188,9 @@ public:
 		// RTL/LTR indication
 		if (l_shape_) {
 			if (rtl)
-				l += h / 3;
+				l += h/2.0 / 3;
 			else
-				r += h / 3;
+				r += h/2.0 / 3;
 		}
 
 		// completion triangle
@@ -202,7 +202,7 @@ public:
 		}
 
 		// compute overall rectangle
-		rect_ = QRect(x - l, y, cursor_width_ + r + l, h);
+		rect_ = QRect((x - l)/2.0, y/2.0, (cursor_width_ + r + l)/2.0, h/2.0);
 	}
 
 	void show(bool set_show = true) { show_ = set_show; }
@@ -792,7 +792,7 @@ void GuiWorkArea::mousePressEvent(QMouseEvent * e)
 {
 	if (d->dc_event_.active && d->dc_event_ == *e) {
 		d->dc_event_.active = false;
-		FuncRequest cmd(LFUN_MOUSE_TRIPLE, e->x(), e->y(),
+		FuncRequest cmd(LFUN_MOUSE_TRIPLE, e->x()*2.0, e->y()*2.0,
 			q_button_state(e->button()));
 		d->dispatch(cmd);
 		e->accept();
@@ -803,7 +803,7 @@ void GuiWorkArea::mousePressEvent(QMouseEvent * e)
 	inputContext()->reset();
 #endif
 
-	FuncRequest const cmd(LFUN_MOUSE_PRESS, e->x(), e->y(),
+	FuncRequest const cmd(LFUN_MOUSE_PRESS, e->x()*2.0, e->y()*2.0,
 		q_button_state(e->button()));
 	d->dispatch(cmd, q_key_state(e->modifiers()));
 
@@ -813,7 +813,7 @@ void GuiWorkArea::mousePressEvent(QMouseEvent * e)
 	// due to the DEPM. We need to do this after the mouse has been
 	// set in dispatch(), because the selection state might change.
 	if (e->button() == Qt::RightButton)
-		d->context_menu_name_ = d->buffer_view_->contextMenu(e->x(), e->y());
+		d->context_menu_name_ = d->buffer_view_->contextMenu(e->x()*2.0, e->y()*2.0);
 
 	e->accept();
 }
@@ -824,7 +824,7 @@ void GuiWorkArea::mouseReleaseEvent(QMouseEvent * e)
 	if (d->synthetic_mouse_event_.timeout.running())
 		d->synthetic_mouse_event_.timeout.stop();
 
-	FuncRequest const cmd(LFUN_MOUSE_RELEASE, e->x(), e->y(),
+	FuncRequest const cmd(LFUN_MOUSE_RELEASE, e->x()*2.0, e->y()*2.0,
 			      q_button_state(e->button()));
 	d->dispatch(cmd);
 	e->accept();
@@ -835,21 +835,21 @@ void GuiWorkArea::mouseMoveEvent(QMouseEvent * e)
 {
 	// we kill the triple click if we move
 	doubleClickTimeout();
-	FuncRequest cmd(LFUN_MOUSE_MOTION, e->x(), e->y(),
+	FuncRequest cmd(LFUN_MOUSE_MOTION, e->x()*2.0, e->y()*2.0,
 		q_motion_state(e->buttons()));
 
 	e->accept();
 
 	// If we're above or below the work area...
-	if ((e->y() <= 20 || e->y() >= viewport()->height() - 20)
+	if ((e->y()*2.0 <= 20 || e->y()*2.0 >= viewport()->height() - 20)
 			&& e->buttons() == mouse_button::button1) {
 		// Make sure only a synthetic event can cause a page scroll,
 		// so they come at a steady rate:
-		if (e->y() <= 20)
+		if (e->y()*2.0 <= 20)
 			// _Force_ a scroll up:
-			cmd.set_y(e->y() - 21);
+			cmd.set_y(e->y()*2.0 - 21);
 		else
-			cmd.set_y(e->y() + 21);
+			cmd.set_y(e->y()*2.0 + 21);
 		// Store the event, to be handled when the timeout expires.
 		d->synthetic_mouse_event_.cmd = cmd;
 
@@ -1121,6 +1121,7 @@ void GuiWorkArea::Private::update(int x, int y, int w, int h)
 void GuiWorkArea::paintEvent(QPaintEvent * ev)
 {
 	QRect const rc = ev->rect();
+    QRect const rcx2 = QRect(rc.left()*2, rc.top()*2, rc.width()*2, rc.height()*2);
 	// LYXERR(Debug::PAINTING, "paintEvent begin: x: " << rc.x()
 	//	<< " y: " << rc.y() << " w: " << rc.width() << " h: " << rc.height());
 
@@ -1135,9 +1136,9 @@ void GuiWorkArea::paintEvent(QPaintEvent * ev)
 
 	QPainter pain(viewport());
 	if (lyxrc.use_qimage) {
-		pain.drawImage(rc, static_cast<QImage const &>(*d->screen_), rc);
+		pain.drawImage(rc, static_cast<QImage const &>(*d->screen_), rcx2);
 	} else {
-		pain.drawPixmap(rc, static_cast<QPixmap const &>(*d->screen_), rc);
+		pain.drawPixmap(rc, static_cast<QPixmap const &>(*d->screen_), rcx2);
 	}
 	d->cursor_->draw(pain);
 	ev->accept();

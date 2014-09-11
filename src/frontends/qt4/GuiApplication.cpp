@@ -596,6 +596,7 @@ QIcon getIcon(FuncRequest const & f, bool unknown)
 		return QIcon();
 	}
 
+	pm.setDevicePixelRatio(2.0);
 	return QIcon(pm);
 }
 
